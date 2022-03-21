@@ -8,21 +8,10 @@ def test_univariate_gaussian():
     # Question 1 - Draw samples and print fitted model
     requested_mu = 10
     requested_sigma = 1
-    X = np.linspace(1, 1000, num=1000)
     Y = np.random.normal(requested_mu, requested_sigma, size=1000)
     Z = UnivariateGaussian().fit(Y)
     mu_hat, sigma_hat = Z.mu_, Z.var_
     print(mu_hat, sigma_hat)
-
-    # make_subplots(rows=1, cols=2)\
-    #     .add_traces([go.Scatter(x=X, y=Y, mode='markers', marker=dict(color='blue', size=3), name=r'Sample')],
-    #                 rows=[1], cols=[1]) \
-    #     .add_traces([go.Scatter(x=X, y=[mu] * X.shape[0], mode='lines', marker=dict(color="black"),
-    #                             name=r'$\widehat\mu$')], rows=[1], cols=[1]) \
-    #     .add_traces([go.Scatter(x=X, y=[10] * X.shape[0], mode='lines', marker=dict(color="red"), name=r'$\mu$')],
-    #                 rows=[1], cols=[1]) \
-    #     .update_layout(title_text=r"$\text{(1) Generating Data From Probabilistic Model}$", height=300) \
-    #     .show()
 
     # Question 2 - Empirically showing sample mean is consistent
     mus = []
@@ -52,15 +41,33 @@ def test_univariate_gaussian():
         .show()
 
 
+def cartesian_product_rows(vec1, vec2):
+    # np.repeat([1, 2, 3], 4) -> [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]
+    # np.tile([1, 2, 3], 4)   -> [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]
+    return np.array([np.repeat(vec1, len(vec2)), np.tile(vec2, len(vec1))])
+
+
 def test_multivariate_gaussian():
     # Question 4 - Draw samples and print fitted model
-    raise NotImplementedError()
-
+    mu = np.array([0, 0, 4, 0])
+    sigma = np.array([[1, 0.2, 0, 0.5], [0.2, 2, 0, 0], [0, 0, 1, 0], [0.5, 0, 0, 1]])
+    Y = np.random.multivariate_normal(mu, sigma, size=1000)
+    Z = MultivariateGaussian().fit(Y)
+    mu_hat, sigma_hat = Z.mu_, Z.cov_
+    print(mu_hat)
+    print(sigma_hat)
     # Question 5 - Likelihood evaluation
-    raise NotImplementedError()
+    mu_one = np.linspace(-10, 10, 200)
+    mu_three = np.linspace(-10, 10, 200)
+    cart_prod = cartesian_product_rows(mu_one, mu_three)
+    all_mus = np.transpose(np.array([cart_prod[:1, :][0], [0] * (200*200), cart_prod[1:, :][0], [0] * (200*200)]))
+    print(all_mus)
+    # raise NotImplementedError()
 
     # Question 6 - Maximum likelihood
-    raise NotImplementedError()
+    #raise NotImplementedError()
+
+
 
 
 if __name__ == '__main__':
