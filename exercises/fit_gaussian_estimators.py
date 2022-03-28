@@ -66,20 +66,24 @@ def test_multivariate_gaussian():
     for i in range(mu_samples_number):
         for j in range(mu_samples_number):
             cur_mu = np.array([mus_data[i], 0, mus_data[j], 0])
-            log_likelihoods[j][i] = fitted_multivariate_gaussian.log_likelihood(cur_mu, sigma, multivariate_sample)
+            log_likelihoods[i][j] = fitted_multivariate_gaussian.log_likelihood(cur_mu, sigma, multivariate_sample)
 
     go.Figure() \
         .add_trace(go.Heatmap(x=mus_data, y=mus_data, z=log_likelihoods, colorscale='Blues')) \
-        .update_yaxes(title_text=r'$f_3\text{ value}$') \
-        .update_xaxes(title_text=r"$f_1\text{ value}$") \
+        .update_yaxes(title_text=r'$f_1\text{ value}$') \
+        .update_xaxes(title_text=r"$f_3\text{ value}$") \
         .update_layout(title=r"$\text{Heatmap of log-likelihood as a function of }f_1, f_3$", height=600, width=1000) \
         .show()
 
     # Question 6 - Maximum likelihood
     maximum_row = np.argmax(log_likelihoods, axis=0)
     maximum_col = np.argmax(log_likelihoods, axis=1)
-    print(round(mus_data[maximum_col[0]], 3), round(mus_data[maximum_row[0]], 3))
+    print(round(mus_data[maximum_row[0]], 3), round(mus_data[maximum_col[0]], 3))
 
+    # quiz_array = [1, 5, 2,  3, 8, -4, -2, 5, 1, 10, -10, 4, 5, 2, 7, 1, 1, 3, 2, -1, -3, 1, -4, 1, 2, 1,
+    #               -4, -4, 1, 3, 2, 6, -6, 8, 3, -6, 4, 1, -2, 3, 1, 4, 1, 4, -2, 3, -1, 0, 3, 5, 0, -2]
+    # quiz_gaussian = UnivariateGaussian().fit(np.array(quiz_array))
+    # print("log likelihood for quiz is: ", quiz_gaussian.log_likelihood(10, 1, np.array(quiz_array)))
 if __name__ == '__main__':
     np.random.seed(0)
     test_univariate_gaussian()

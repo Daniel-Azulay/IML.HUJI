@@ -81,7 +81,7 @@ class UnivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        Z = np.array(X - 10) ** 2
+        Z = np.array(X - self.mu_) ** 2
         return_array = (1 / np.sqrt(2 * math.pi * self.var_)) * np.exp((-1 / (2 * self.var_)) * Z)
         return return_array
 
@@ -104,8 +104,9 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        return (1 / (2 * math.pi * sigma ** 2)) ** (X.shape[1] / 2) * (
-            math.exp((-2 / (sigma ** 2)) * sum((X - mu) ** 2)))
+        first_element = (-X.shape[0] / 2) * np.log(2*np.pi*sigma)
+        second_element = (-1/(2*sigma)) * np.sum((X - mu) ** 2)
+        return first_element + second_element
 
 
 class MultivariateGaussian:
