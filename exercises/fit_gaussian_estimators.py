@@ -84,6 +84,8 @@ def test_multivariate_gaussian():
     #               -4, -4, 1, 3, 2, 6, -6, 8, 3, -6, 4, 1, -2, 3, 1, 4, 1, 4, -2, 3, -1, 0, 3, 5, 0, -2]
     # quiz_gaussian = UnivariateGaussian().fit(np.array(quiz_array))
     # print("log likelihood for quiz is: ", quiz_gaussian.log_likelihood(10, 1, np.array(quiz_array)))
+
+
 if __name__ == '__main__':
     np.random.seed(0)
     test_univariate_gaussian()
