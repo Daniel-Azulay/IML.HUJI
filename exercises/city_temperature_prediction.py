@@ -7,6 +7,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import os.path
+import matplotlib
 pio.templates.default = "simple_white"
 
 
@@ -41,10 +42,18 @@ if __name__ == '__main__':
 
     # Question 2 - Exploring data for specific country
     israeli_samples = samples.loc[samples['Country'] == 'Israel']
-    fig = px.scatter(israeli_samples, x='DayOfYear', y='Temp', color=israeli_samples['Year'].astype(str),
-                     height=600, width=800).show()
+    px.scatter(israeli_samples, x='DayOfYear', y='Temp', color=israeli_samples['Year'].astype(str),
+               height=600, width=900).show()
+    std_of_month = israeli_samples.groupby('Month').agg({'Temp': 'std'})\
+        .rename(columns={'Temp': 'STD of Temp'}).reset_index()
+    px.bar(std_of_month, x='Month', y='STD of Temp', height=600, width=900).show()
+
     # Question 3 - Exploring differences between countries
-    raise NotImplementedError()
+    country_and_month = samples.groupby(['Country', 'Month']).agg({'Temp': ['mean', 'std']})
+    country_and_month.columns = ["Average Temp and STD", "std"]
+    country_and_month = country_and_month.reset_index()
+    px.line(country_and_month, x='Month', y='Average Temp and STD', error_y='std', color='Country',
+            height=600, width=900).show()
 
     # Question 4 - Fitting model for different values of `k`
     raise NotImplementedError()
