@@ -20,6 +20,7 @@ class PolynomialFitting(BaseEstimator):
         """
         super().__init__()
         self.degree = k
+        self.lin_model = LinearRegression(False)
 
     def _fit(self, X: np.ndarray, y: np.ndarray) -> NoReturn:
         """
@@ -33,7 +34,7 @@ class PolynomialFitting(BaseEstimator):
         y : ndarray of shape (n_samples, )
             Responses of input data to fit to
         """
-        self.lin_model = LinearRegression(False).fit(self.__transform(X), y)
+        self.lin_model.fit(self.__transform(X), y)
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -84,4 +85,4 @@ class PolynomialFitting(BaseEstimator):
         transformed: ndarray of shape (n_samples, k+1)
             Vandermonde matrix of given samples up to degree k
         """
-        return np.vander(X, self.degree, increasing=True)
+        return np.vander(X, self.degree + 1, increasing=True)

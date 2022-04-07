@@ -56,7 +56,28 @@ if __name__ == '__main__':
             height=600, width=900).show()
 
     # Question 4 - Fitting model for different values of `k`
-    raise NotImplementedError()
+    israeli_y = israeli_samples.pop('Temp')
+    israeli_x = israeli_samples.pop('DayOfYear')
+    tr_israeli_x, tr_israeli_y, tst_israeli_x, tst_israeli_y = split_train_test(israeli_x, israeli_y, 0.75)
+    israeli_loss_array = []
+    for degree in range(1, 11):
+        poly_model = PolynomialFitting(degree).fit(tr_israeli_x, tr_israeli_y)
+        loss = round(poly_model.loss(tst_israeli_x, tst_israeli_y), 2)
+        print("loss for polynomial of degree " , degree, "is: ", loss)
+        israeli_loss_array.append(loss)
+    israeli_loss_df = pd.DataFrame({'Loss': israeli_loss_array})
+    israeli_loss_df['Max Degree of Polynomial'] = np.arange(1, 11)
+    px.bar(israeli_loss_df, x='Max Degree of Polynomial', y='Loss', height=600, width=900).show()
+
 
     # Question 5 - Evaluating fitted model on different countries
-    raise NotImplementedError()
+    poly_model = PolynomialFitting(5).fit(israeli_x, israeli_y)
+    countries_loss_df = pd.DataFrame({"Country": ["Jordan", "South Africa", "The Netherlands"]})
+    country_loss_array = []
+    for country in ["Jordan", "South Africa", "The Netherlands"]:
+        country_samples = samples.loc[samples['Country'] == country]
+        country_x = country_samples['DayOfYear']
+        country_y = country_samples['Temp']
+        country_loss_array.append(round(poly_model.loss(country_x, country_y), 2))
+    countries_loss_df['Loss'] = country_loss_array
+    px.bar(countries_loss_df, x='Country', y='Loss', height=400, width=500).show()
