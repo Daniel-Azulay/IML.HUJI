@@ -41,9 +41,9 @@ def load_data(filename: str):
     data.time_since_renovation.where(data.yr_renovated == 0, data.year_of_purchase - data.yr_renovated)
 
     # delete negative prices, negative age of house\time since renovation, negative bedrooms\bathrooms\sqfts
-    data = data.drop(data.index[(data.price < 0) | (data.age_of_house < 0) | (data.bedrooms < 0) | (data.bathrooms < 0)
+    data = data.drop(data.index[(data.price <= 0) | (data.age_of_house < 0) | (data.bedrooms < 0) | (data.bathrooms < 0)
                      | (data.sqft_living <= 0) | (data.sqft_above < 0) | (data.sqft_basement < 0) |
-                    (data.sqft_living15 < 0) | (data.sqft_lot15 < 0) | (data.time_since_renovation < 0)])
+                     (data.time_since_renovation < 0)])
 
 
     # make id as index, get dummies for zipcode
@@ -139,4 +139,4 @@ if __name__ == '__main__':
               layout=go.Layout(title="mean of loss over 10 iterations, as function of training size",
                                      xaxis={"title": "percentage of the training set used for training"},
                                      yaxis={"title": "mean of loss"},
-                                     height=400)).show()
+                                     height=400, width=1000)).show()
