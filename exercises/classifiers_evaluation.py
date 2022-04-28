@@ -55,6 +55,28 @@ def run_perceptron():
                 x=np.array(range(len(losses))), y=losses, labels={'x': 'Iterations', 'y': 'Loss'}).show()
 
 
+def get_ellipse(mu: np.ndarray, cov: np.ndarray):
+    """
+    Draw an ellipse centered at given location and according to specified covariance matrix
+    Parameters
+    ----------
+    mu : ndarray of shape (2,)
+        Center of ellipse
+    cov: ndarray of shape (2,2)
+        Covariance of Gaussian
+    Returns
+    -------
+        scatter: A plotly trace object of the ellipse
+    """
+    l1, l2 = tuple(np.linalg.eigvalsh(cov)[::-1])
+    theta = atan2(l1 - cov[0, 0], cov[0, 1]) if cov[0, 1] != 0 else (np.pi / 2 if cov[0, 0] < cov[1, 1] else 0)
+    t = np.linspace(0, 2 * np.pi, 100)
+    xs = (l1 * np.cos(theta) * np.cos(t)) - (l2 * np.sin(theta) * np.sin(t))
+    ys = (l1 * np.sin(theta) * np.cos(t)) + (l2 * np.cos(theta) * np.sin(t))
+
+    return go.Scatter(x=mu[0] + xs, y=mu[1] + ys, mode="lines", marker_color="black")
+
+
 def compare_gaussian_classifiers():
     """
     Fit both Gaussian Naive Bayes and LDA classifiers on both gaussians1 and gaussians2 datasets
@@ -74,6 +96,8 @@ def compare_gaussian_classifiers():
         lda_prediction = lda_model.predict(X)
         lda_accuracy = round(accuracy(y, lda_prediction), 3)
 
+        # create the two graphs with predictions:
+
         fig = make_subplots(rows=1, cols=2, subplot_titles=[f" Naive Gaussian Bayes model, accuracy = {gnb_accuracy}",
                                                             f"LDA model, accuracy = {lda_accuracy}"]) \
             .add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode='markers', marker=dict(size=20, color=gnb_prediction,
@@ -81,38 +105,26 @@ def compare_gaussian_classifiers():
                        col=1) \
             .add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode='markers', marker=dict(size=20, color=lda_prediction,
                                                                                     symbol=y, line_width=1)), row=1,
-                       col=2) \
-            .add_trace(go.Scatter(x=gnb_model.mu_[:, 0], y=gnb_model.mu_[:, 1], mode='markers',
-                                  marker=dict(size=20, color='black', symbol='x')), row=1, col=1) \
-            .add_trace(go.Scatter(x=lda_model.mu_[:, 0], y=lda_model.mu_[:, 1], mode='markers', marker=dict(size=20,
-                                                                                                            color='black',
-                                                                                                            symbol='x')),
-                       row=1, col=2)
+                       col=2)
 
-        # add ellipses for gnb model:
+        # add the X's in center of ellipses:
+
+        fig.add_trace(go.Scatter(x=gnb_model.mu_[:, 0], y=gnb_model.mu_[:, 1], mode='markers',
+                                 marker=dict(size=20, color='black', symbol='x')), row=1, col=1) \
+            .add_trace(go.Scatter(x=lda_model.mu_[:, 0], y=lda_model.mu_[:, 1], mode='markers',
+                                  marker=dict(size=20, color='black', symbol='x')), row=1, col=2)
+
+        # draw ellipses for gnb model:
 
         for k in gnb_model.classes_:
-            cov_k = np.diag(gnb_model.vars_[k])
-            l1, l2 = tuple(np.linalg.eigvalsh(cov_k)[::-1])
-            theta = atan2(l1 - cov_k[0, 0], cov_k[0, 1]) if cov_k[0, 1] != 0 else (np.pi / 2 if
-                                                                                   cov_k[0, 0] < cov_k[1, 1] else 0)
-            t = np.linspace(0, 2 * np.pi, 100)
-            xs = (l1 * np.cos(theta) * np.cos(t)) - (l2 * np.sin(theta) * np.sin(t))
-            ys = (l1 * np.sin(theta) * np.cos(t)) + (l2 * np.cos(theta) * np.sin(t))
-            fig.add_trace(go.Scatter(x=gnb_model.mu_[k][0] + xs, y=gnb_model.mu_[k][1] + ys, mode="lines",
-                                     marker_color="black"), row=1, col=1)
+            fig.add_trace(get_ellipse(gnb_model.mu_[k], np.diag(gnb_model.vars_[k])), row=1, col=1)
 
-        # add ellipses for lda model:
+
+        # draw ellipses for lda model:
 
         for k in lda_model.classes_:
-            l1, l2 = tuple(np.linalg.eigvalsh(lda_model.cov_)[::-1])
-            theta = atan2(l1 - lda_model.cov_[0, 0], lda_model.cov_[0, 1]) if lda_model.cov_[0, 1] != 0 \
-                else (np.pi / 2 if lda_model.cov_[0, 0] < lda_model.cov_[1, 1] else 0)
-            t = np.linspace(0, 2 * np.pi, 100)
-            xs = (l1 * np.cos(theta) * np.cos(t)) - (l2 * np.sin(theta) * np.sin(t))
-            ys = (l1 * np.sin(theta) * np.cos(t)) + (l2 * np.cos(theta) * np.sin(t))
-            fig.add_trace(go.Scatter(x=lda_model.mu_[k][0] + xs, y=lda_model.mu_[k][1] + ys, mode="lines",
-                                     marker_color="black"), row=1, col=2)
+            fig.add_trace(get_ellipse(lda_model.mu_[k], lda_model.cov_), row=1, col=2)
+
         fig.show()
 
 
